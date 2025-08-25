@@ -50,11 +50,9 @@ read_interactions <- function(csv_path) {
   df <- data.frame(
     from = x$ligand_complex,
     to   = x$receptor_complex,
-    regulatory_potential = x$regulatory_potential
+    regulatory_potential = x$lr_logfc
   )
-  # 若 rp 不在 [0,1]，可放开下面两行进行 min-max 归一化
-  # rng <- range(df$regulatory_potential, na.rm = TRUE)
-  # df$regulatory_potential <- if (diff(rng) == 0) 0 else (df$regulatory_potential - rng[1]) / diff(rng)
+  
   df
 }
 
@@ -75,14 +73,14 @@ plot_chord <- function(df, cond, sector_order, grid.col, col_fun,
   circos.clear()
   
   if (isTRUE(split_duplicate_names)) {
-    # 强制两边都出现同名节点
+
     df$from_node <- paste0(df$from, " (L)")
     df$to_node   <- paste0(df$to,   " (R)")
     from_nodes <- unique(df$from_node)
     to_nodes   <- unique(df$to_node)
     sector_order2 <- c(from_nodes, to_nodes)
   } else {
-    # 最小改动：同名节点只保留在 from 块，保证两块连续
+
     from_nodes <- unique(df$from)
     to_nodes   <- setdiff(unique(df$to), from_nodes)
     sector_order2 <- c(from_nodes, to_nodes)
@@ -95,7 +93,7 @@ plot_chord <- function(df, cond, sector_order, grid.col, col_fun,
         setNames(rep("darkgreen",length(to_nodes)),   to_nodes)
       )
     } else {
-      # 补齐缺失键
+
       missing <- setdiff(sector_order2, names(grid.col))
       if (length(missing) > 0) {
         fill_cols <- ifelse(missing %in% from_nodes, "brown2", "darkgreen")
@@ -117,7 +115,6 @@ plot_chord <- function(df, cond, sector_order, grid.col, col_fun,
     }
   }
   
-  # ==== 在两块之间插一个大缝 ====
   gaps <- c(
     rep(small_gap, max(length(from_nodes) - 1, 0)), big_gap,
     rep(small_gap, max(length(to_nodes)   - 1, 0)), big_gap
@@ -167,14 +164,14 @@ plot_chord <- function(df, cond, sector_order, grid.col, col_fun,
   
   circos.track(track.index = 2, ylim = c(0, 1.5), panel.fun = function(x, y) {
   circos.text(CELL_META$xcenter, CELL_META$ylim[1] + mm_y(12),
-                CELL_META$sector.index, facing = "clockwise", niceFacing = TRUE, cex = 0.8, adj = 0)
+                CELL_META$sector.index, facing = "clockwise", niceFacing = TRUE, cex = 1.2, adj = 0)
   }, bg.border = NA)
   
-  grid.text(paste0(from_title, " to ", to_title, " — ", cond),
-            x = 0.5, y = 0.9, gp = gpar(fontsize = 18, fontface = "bold"))
+  grid.text(paste0(from_title, " to ", to_title, " in Male Mice", "\n", cond),
+            x = 0.5, y = 0.95, gp = gpar(fontsize = 18, fontface = "bold"))
   
   lgd_links <- Legend(at = c(0, 0.5, 1), col_fun = col_fun,
-                      title_position = "topcenter", title = "LR regulatory potential")
+                      title_position = "topcenter", title = "LR LogFC")
   draw(lgd_links, x = unit(20, "mm"), y = unit(140, "mm"), just = c("left","bottom"))
   
   lgd_LR <- Legend(at = c(paste(from_legend, "ligands"), paste(to_legend, "receptors")),
