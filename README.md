@@ -11,8 +11,8 @@ Timi_Ms_Thesis/
 ├─ rawdata_qc.ipynb # Load batches; HashSolo to remove doublets and batch correction; concatenate batches
 ├─ LIANA.ipynb # filter and post-process LR interactions
 ├─ Conditional.R # Chord plot utilities (circlize/ComplexHeatmap)
-├─ environment.yml # Conda environment (reproducible dependencies)
-└─ results/ # Figures & tables (output)
+└─ environment.yml # Conda environment (reproducible dependencies)
+
 
 ## Data
 - **Input:** processed and subsetted adatas (e.g., `.h5ad`).
